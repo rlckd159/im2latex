@@ -62,7 +62,7 @@ class Trainer(object):
         tgt4training = tgt4training.to(self.device)
         tgt4cal_loss = tgt4cal_loss.to(self.device)
 
-        logits = self.model(imgs, tgt4training, epsilon)
+        logits = self.model(imgs, tgt4training)
 
         # calculate loss
         loss = cal_loss(logits, tgt4cal_loss)
