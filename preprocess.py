@@ -33,9 +33,6 @@ def preprocess(data_dir, split):
             pair = (img_tensor, formula)
             pairs.append(pair)
         pairs.sort(key=img_size)
-    i1, f1 = pairs
-    print(i1)
-    print(f1)
     out_file = join(data_dir, "{}.pkl".format(split))
     torch.save(pairs, out_file)
     print("Save {} dataset to {}".format(split, out_file))

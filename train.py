@@ -39,6 +39,8 @@ def main():
         help="The dataset's dir")
 
     # training args
+    parser.add_argument("--max_len", type=int,
+                        default=150, help="Max size of formula")
     parser.add_argument(
         "--cuda", action='store_true', default=True, help="Use cuda or not")
     parser.add_argument("--batch_size", type=int, default=4)
