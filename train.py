@@ -62,18 +62,26 @@ def main():
         default="./ckpt",
         help="The dir to save checkpoint")
     parser.add_argument(
-        "--vocab_path",
-        type=str,
-        default="./data/sample_data/vocab.pkl",
-        help="The path to vocab file")
-    parser.add_argument(
         "--print_freq",
         type=int,
-        default=4,
+        default=10,
         help="The frequency to print message")
+    parser.add_argument("--seed", type=int, default=2020,
+                        help="The random seed for reproducing ")
+    parser.add_argument("--from_check_point", action='store_true',
+                        default=False, help="Training from checkpoint or not")
 
     args = parser.parse_args()
+    max_epoch = args.epochs
+    from_check_point = args.from_check_point
+    if from_check_point:
+        checkpoint_path = get_checkpoint(args.save_dir)
+        checkpoint = torch.load(checkpoint_path)
+        args = checkpoint['args']
+    print("Training args:", args)
 
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
     # Building vocab
     print("Load vocab...")
     vocab = load_vocab(args.data_path)
@@ -114,10 +122,25 @@ def main():
         "min",
         factor=args.lr_decay,
         patience=args.lr_patience,
-        verbose=True,
-        min_lr=args.min_lr)
+        verbose=True)
+        #min_lr=args.min_lr)
 
-    trainer = Trainer(optimizer, model, lr_scheduler, train_loader, val_loader, args)
+    if from_check_point:
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        epoch = checkpoint['epoch']
+        lr_scheduler.load_state_dict(checkpoint['lr_sche'])
+        # init trainer from checkpoint
+        trainer = Trainer(optimizer, model, lr_scheduler,
+                          train_loader, val_loader, args,
+                          use_cuda=use_cuda,
+                          init_epoch=epoch, last_epoch=max_epoch)
+    else:
+        trainer = Trainer(optimizer, model, lr_scheduler,
+                          train_loader, val_loader, args,
+                          use_cuda=use_cuda,
+                          init_epoch=1, last_epoch=max_epoch)
+
     # begin training
     trainer.train()
 
