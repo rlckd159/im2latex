@@ -19,14 +19,25 @@ def main():
     # parser.add_argument('--path', required=True, help='root of the model')
 
     # model args
-    parser.add_argument("--emb_dim", type=int,
-                        default=80, help="Embedding size")
-    parser.add_argument("--dec_rnn_h", type=int, default=512,
-                        help="The hidden state of the decoder RNN")
-    parser.add_argument("--data_path", type=str,
-                        default="./data/", help="The dataset's dir")
-    parser.add_argument("--add_position_features", action='store_true',
-                        default=False, help="Use position embeddings or not")
+    parser.add_argument(
+        "--emb_dim", type=int, default=80, help="Embedding size")
+    parser.add_argument(
+        "--enc_rnn_h",
+        type=int,
+        default=256,
+        help="The hidden state of the encoder RNN")
+    parser.add_argument(
+        "--dec_rnn_h",
+        type=int,
+        default=512,
+        help="The hidden state of the decoder RNN")
+
+    parser.add_argument(
+        "--data_path",
+        type=str,
+        default="./data/sample_data/",
+        help="The dataset's dir")
+
     # training args
     parser.add_argument("--max_len", type=int,
                         default=150, help="Max size of formula")
@@ -101,12 +112,13 @@ def main():
 
     # construct model
     print("Construct model")
+    # construct model
+
     vocab_size = len(vocab)
-    model = Im2LatexModel(
-        vocab_size, args.emb_dim, args.dec_rnn_h,
-        add_pos_feat=args.add_position_features,
-        dropout=args.dropout
-    )
+    model = Im2LatexModel(vocab_size, args.emb_dim, args.enc_rnn_h,
+                          args.dec_rnn_h)
+
+
     model = model.to(device)
     print("Model Settings:")
     print(model)

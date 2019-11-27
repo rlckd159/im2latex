@@ -43,6 +43,8 @@ def build_vocab(data_dir, min_count=10):
 
     with open(join(data_dir, 'im2latex_train_filter.lst'), 'r') as f:
         for line in f:
+            if not line.strip('\n'):
+                continue
             _, idx = line.strip('\n').split()
             idx = int(idx)
             formula = formulas[idx].split()

@@ -4,7 +4,7 @@ from os.path import join
 import torch
 from torch.nn.utils import clip_grad_norm_
 
-from utils import cal_loss, cal_epsilon
+from utils import cal_loss
 
 
 class Trainer(object):
@@ -61,8 +61,7 @@ class Trainer(object):
         imgs = imgs.to(self.device)
         tgt4training = tgt4training.to(self.device)
         tgt4cal_loss = tgt4cal_loss.to(self.device)
-        epsilon = cal_epsilon(
-            self.args.decay_k, self.total_step, self.args.sample_method)
+
         logits = self.model(imgs, tgt4training, epsilon)
 
         # calculate loss
@@ -85,9 +84,7 @@ class Trainer(object):
                 tgt4training = tgt4training.to(self.device)
                 tgt4cal_loss = tgt4cal_loss.to(self.device)
 
-                epsilon = cal_epsilon(
-                    self.args.decay_k, self.total_step, self.args.sample_method)
-                logits = self.model(imgs, tgt4training, epsilon)
+                logits = self.model(imgs, tgt4training)
                 loss = cal_loss(logits, tgt4cal_loss)
                 val_total_loss += loss
             avg_loss = val_total_loss / len(self.val_loader)

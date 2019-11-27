@@ -22,6 +22,8 @@ def preprocess(data_dir, split):
     transform = transforms.ToTensor()
     with open(split_file, 'r') as f:
         for line in f:
+            if not line.strip('\n') :
+                continue
             img_name, formula_id = line.strip('\n').split()
             # load img and its corresponding formula
             img_path = join(images_dir, img_name)
