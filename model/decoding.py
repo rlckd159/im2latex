@@ -39,8 +39,8 @@ class LatexProducer(object):
         imgs = imgs.to(self.device)
         self.model.eval()
 
-        enc_outs = self.model.encode(imgs)
-        dec_states, O_t = self.model.init_decoder(enc_outs)
+        enc_outs, hiddens = self.encode(imgs)
+        dec_states, O_t = self._model.init_decoder(enc_outs, hiddens)
 
         batch_size = imgs.size(0)
         # storing decoding results
@@ -96,12 +96,12 @@ class LatexProducer(object):
 
         # encoding
         # img = img.unsqueeze(0)  # [1, C, H, W]
-        enc_outs = self.model.encode(img)  # [1, H*W, OUT_C]
+        enc_outs, hiddens = self.model.encode(img)  # [1, H*W, OUT_C]
 
         # prepare data for decoding
         enc_outs = enc_outs.expand(self.beam_size, -1, -1)
         # [Beam_size, dec_rnn_h]
-        dec_states, O_t = self.model.init_decoder(enc_outs)
+        dec_states, O_t = self.model.init_decoder(enc_outs, hiddens)
 
         # store top k ids (k is less or equal to beam_size)
         # in first decoding step, all they are  start token
@@ -169,9 +169,9 @@ class LatexProducer(object):
     def _batch_beam_search(self, imgs):
         self.model.eval()
         imgs = imgs.to(self.device)
-        enc_outs = self.model.encode(imgs)  # [batch_size, H*W, OUT_C]
+        enc_outs, hiddens = self.model.encode(imgs)  # [batch_size, H*W, OUT_C]
         # enc_outs = enc_outs.expand(self.beam_size, -1, -1)
-        dec_states, O_t = self.model.init_decoder(enc_outs)
+        dec_states, O_t = self.model.init_decoder(enc_outs, hiddens)
 
         batch_size = imgs.size(0)
         start_predictions = torch.ones(

@@ -51,15 +51,12 @@ def main():
         Im2LatexDataset(args.data_path, args.split, args.max_len),
         batch_size=args.batch_size,
         collate_fn=partial(collate_fn, vocab.sign2id),
-        pin_memory=True if use_cuda else False,
+        #pin_memory=True if use_cuda else False,
         num_workers=4
     )
 
-    model = Im2LatexModel(
-        len(vocab), model_args.emb_dim, model_args.dec_rnn_h,
-        add_pos_feat=model_args.add_position_features,
-        dropout=model_args.dropout
-    )
+    model = Im2LatexModel(len(vocab), model_args.emb_dim, model_args.enc_rnn_h, model_args.dec_rnn_h)
+
     model.load_state_dict(checkpoint['model_state_dict'])
 
     result_file = open(args.result_path, 'w')

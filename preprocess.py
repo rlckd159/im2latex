@@ -27,7 +27,7 @@ def preprocess(data_dir, split):
             img_name, formula_id = line.strip('\n').split()
             # load img and its corresponding formula
             img_path = join(images_dir, img_name)
-            img = Image.open(img_path).convert('RGB')
+            img = Image.open(img_path)
             img_tensor = transform(img)
             formula = formulas[int(formula_id)]
             pair = (img_tensor, formula)
